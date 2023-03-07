@@ -1,55 +1,48 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
+const mongoString = process.env.DATABASE_URL;
+//console.log("string is: " + mongoString);
+
+mongoose.connect(mongoString, { useNewUrlParser: true });
+const database = mongoose.connection;
+
+database.on("error", (error) => {
+  console.log(error);
+});
+
+database.once("connected", () => {
+  console.log("Database Connected");
+});
 const app = express();
 
+app.use(express.json());
+
+// "/" path
 app.get("/", (req, res) => {
-  res.send("Hello from app.get");
+  db.collection("users")
+    .find({})
+    .toArray((err, rows) => {
+      data = rows;
+      res.send(data);
+    });
 });
 
-// Create a route for the "/create" path
-app.post("/create", (req, res) => {
-  // Create a new item
-  const item = req.body;
-  // Return the created item
-  res.json(item);
-});
+// "/add" path
+app.get("/add", (req, res) => {
+  const { name, familyName } = req.query;
+  data.push({ name, familyName });
 
-// Create a route for the "/read" path
-app.get("/read", (req, res) => {
-  // Read all items from the database
-  const items = // ...
-    // Return the read items
-    res.json(items);
-});
-
-// Create a route for the "/update" path
-app.put("/update", (req, res) => {
-  // Update an item
-  const item = req.body;
-  // Return the updated item
-  res.json(item);
-});
-
-// Create a route for the "/delete" path
-app.delete("/delete", (req, res) => {
-  // Delete an item
-  const item = req.body;
-  // Return the deleted item
-  res.json(item);
-});
-
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const uri =
-  "mongodb+srv://masih:S4mijaT7ry7@cluster0.geioxa5.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverApi: ServerApiVersion.v1,
-});
-client.connect((err) => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
+  // Insert into the database
+  const request = new sql.Request();
+  request.query(
+    `INSERT INTO users (name, familyName) VALUES ('${name}', '${familyName}')`,
+    (err, result) => {
+      if (err) console.log(err);
+      res.send(data);
+    }
+  );
 });
 
 app.listen(3000, () => console.log("Server is Listening to port 3000"));
